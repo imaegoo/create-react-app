@@ -29,16 +29,25 @@ async function connectToDatabase(uri) {
 // The main, exported, function of the endpoint,
 // dealing with the request and subsequent response
 module.exports = async (req, res) => {
+  let log = ''
+  let time = Date.now()
+
   // Get a database connection, cached or otherwise,
   // using the connection string environment variable as the argument
   const db = await connectToDatabase(process.env.MONGODB_URI)
 
+  log += `连接耗时：${Date.now() - time}`
+
   // Select the "users" collection from the database
   const collection = await db.collection('users')
+
+  time = Date.now()
 
   // Select the users collection from the database
   const users = await collection.find({}).toArray()
 
+  log += `查询耗时：${Date.now() - time}`
+
   // Respond with a JSON string of all users in the collection
-  res.status(200).json({ users })
+  res.status(200).json({ users, log })
 }
